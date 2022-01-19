@@ -29,10 +29,6 @@ repositories {
     jcenter()
     mavenCentral()
     mavenLocal()
-    maven {
-        name = "Bintray WaveBeans"
-        url = uri("https://dl.bintray.com/wavebeans/wavebeans")
-    }
 }
 
 val compileKotlin: KotlinCompile by tasks
