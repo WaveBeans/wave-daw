@@ -22,6 +22,8 @@ data class KeepNote(
     override val offset: Int
 ) : MidiEvent
 
+typealias PolyphonicMidiBuffer = Array<MidiBuffer>
+
 data class MidiBuffer(
     val events: List<MidiEvent>,
     val length: Int,
