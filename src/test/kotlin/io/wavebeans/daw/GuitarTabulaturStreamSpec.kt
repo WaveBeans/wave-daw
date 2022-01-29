@@ -28,69 +28,69 @@ class GuitarTabulaturStreamSpec : Spek({
             assertThat(tab.asSequence(1000.0f).toList()).all {
                 size().isEqualTo(6)
                 index(0).all {
-                    prop(PolyphonicMidiBuffer::length).isEqualTo(500)
-                    prop(PolyphonicMidiBuffer::events).all {
-                        key("e").containsExactly(EndNote(0))
-                        key("B").containsExactly(EndNote(0))
-                        key("G").containsExactly(EndNote(0))
-                        key("D").containsExactly(EndNote(0))
-                        key("A").containsExactly(EndNote(0))
-                        key("E").containsExactly(StartNote(E2, 0))
+                    prop(PolyphonicMidiChunk::length).isEqualTo(500)
+                    prop(PolyphonicMidiChunk::events).all {
+                        key("e").containsExactly(NoteOff(0))
+                        key("B").containsExactly(NoteOff(0))
+                        key("G").containsExactly(NoteOff(0))
+                        key("D").containsExactly(NoteOff(0))
+                        key("A").containsExactly(NoteOff(0))
+                        key("E").containsExactly(NoteOn(E2, 0))
                     }
                 }
                 index(1).all {
-                    prop(PolyphonicMidiBuffer::length).isEqualTo(500)
-                    prop(PolyphonicMidiBuffer::events).all {
-                        key("e").containsExactly(EndNote(0))
-                        key("B").containsExactly(EndNote(0))
-                        key("G").containsExactly(StartNote(G3, 0))
-                        key("D").containsExactly(EndNote(0))
-                        key("A").containsExactly(EndNote(0))
-                        key("E").containsExactly(EndNote(0))
+                    prop(PolyphonicMidiChunk::length).isEqualTo(500)
+                    prop(PolyphonicMidiChunk::events).all {
+                        key("e").containsExactly(NoteOff(0))
+                        key("B").containsExactly(NoteOff(0))
+                        key("G").containsExactly(NoteOn(G3, 0))
+                        key("D").containsExactly(NoteOff(0))
+                        key("A").containsExactly(NoteOff(0))
+                        key("E").containsExactly(NoteOff(0))
                     }
                 }
                 index(2).all {
-                    prop(PolyphonicMidiBuffer::length).isEqualTo(500)
-                    prop(PolyphonicMidiBuffer::events).all {
-                        key("e").containsExactly(EndNote(0))
-                        key("B").containsExactly(StartNote(B3, 0))
-                        key("G").containsExactly(EndNote(0))
-                        key("D").containsExactly(EndNote(0))
-                        key("A").containsExactly(EndNote(0))
-                        key("E").containsExactly(EndNote(0))
+                    prop(PolyphonicMidiChunk::length).isEqualTo(500)
+                    prop(PolyphonicMidiChunk::events).all {
+                        key("e").containsExactly(NoteOff(0))
+                        key("B").containsExactly(NoteOn(B3, 0))
+                        key("G").containsExactly(NoteOff(0))
+                        key("D").containsExactly(NoteOff(0))
+                        key("A").containsExactly(NoteOff(0))
+                        key("E").containsExactly(NoteOff(0))
                     }
                 }
                 index(3).all {
-                    prop(PolyphonicMidiBuffer::length).isEqualTo(500)
-                    prop(PolyphonicMidiBuffer::events).all {
-                        key("e").containsExactly(StartNote(E4, 0))
-                        key("B").containsExactly(EndNote(0))
-                        key("G").containsExactly(EndNote(0))
-                        key("D").containsExactly(EndNote(0))
-                        key("A").containsExactly(EndNote(0))
-                        key("E").containsExactly(EndNote(0))
+                    prop(PolyphonicMidiChunk::length).isEqualTo(500)
+                    prop(PolyphonicMidiChunk::events).all {
+                        key("e").containsExactly(NoteOn(E4, 0))
+                        key("B").containsExactly(NoteOff(0))
+                        key("G").containsExactly(NoteOff(0))
+                        key("D").containsExactly(NoteOff(0))
+                        key("A").containsExactly(NoteOff(0))
+                        key("E").containsExactly(NoteOff(0))
                     }
                 }
                 index(4).all {
-                    prop(PolyphonicMidiBuffer::length).isEqualTo(500)
-                    prop(PolyphonicMidiBuffer::events).all {
-                        key("e").containsExactly(EndNote(0))
-                        key("B").containsExactly(StartNote(B3, 0))
-                        key("G").containsExactly(EndNote(0))
-                        key("D").containsExactly(EndNote(0))
-                        key("A").containsExactly(EndNote(0))
-                        key("E").containsExactly(EndNote(0))
+                    prop(PolyphonicMidiChunk::length).isEqualTo(500)
+                    prop(PolyphonicMidiChunk::events).all {
+                        key("e").containsExactly(NoteOff(0))
+                        key("B").containsExactly(NoteOn(B3, 0))
+                        key("G").containsExactly(NoteOff(0))
+                        key("D").containsExactly(NoteOff(0))
+                        key("A").containsExactly(NoteOff(0))
+                        key("E").containsExactly(NoteOff(0))
                     }
                 }
                 index(5).all {
-                    prop(PolyphonicMidiBuffer::length).isEqualTo(500)
-                    prop(PolyphonicMidiBuffer::events).all {
-                        key("e").containsExactly(EndNote(0))
-                        key("B").containsExactly(EndNote(0))
-                        key("G").containsExactly(StartNote(G3, 0))
-                        key("D").containsExactly(EndNote(0))
-                        key("A").containsExactly(EndNote(0))
-                        key("E").containsExactly(EndNote(0))
+                    prop(PolyphonicMidiChunk::length).isEqualTo(500)
+                    prop(PolyphonicMidiChunk::events).all {
+                        key("e").containsExactly(NoteOff(0))
+                        key("B").containsExactly(NoteOff(0))
+                        key("G").containsExactly(NoteOn(G3, 0))
+                        key("D").containsExactly(NoteOff(0))
+                        key("A").containsExactly(NoteOff(0))
+                        key("E").containsExactly(NoteOff(0))
                     }
                 }
             }
@@ -98,7 +98,7 @@ class GuitarTabulaturStreamSpec : Spek({
     }
 })
 
-fun Assert<MidiBuffer>.isEqualTo(length: Int, vararg events: MidiEvent) = all {
-    prop(MidiBuffer::events).containsExactly(*events)
-    prop(MidiBuffer::length).isEqualTo(length)
+fun Assert<MidiChunk>.isEqualTo(length: Int, vararg events: MidiEvent) = all {
+    prop(MidiChunk::events).containsExactly(*events)
+    prop(MidiChunk::length).isEqualTo(length)
 }

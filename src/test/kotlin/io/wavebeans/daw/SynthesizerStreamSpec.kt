@@ -5,7 +5,6 @@ import assertk.assertions.containsExactly
 import io.wavebeans.lib.AnyBean
 import io.wavebeans.lib.BeanParams
 import io.wavebeans.lib.BeanStream
-import io.wavebeans.lib.Fn
 import io.wavebeans.lib.Sample
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -13,9 +12,9 @@ import org.spekframework.spek2.style.specification.describe
 class SynthesizerStreamSpec : Spek({
     describe("Synthesizing numbers") {
 
-        fun synthesizerStream(midiNotes: List<MidiBuffer>) =
+        fun synthesizerStream(midiNotes: List<MidiChunk>) =
             SynthesizerStream(
-                input = object : BeanStream<MidiBuffer> {
+                input = object : BeanStream<MidiChunk> {
                     override val parameters: BeanParams
                         get() = throw UnsupportedOperationException("not required")
 
@@ -26,7 +25,7 @@ class SynthesizerStreamSpec : Spek({
                     override val desiredSampleRate: Float?
                         get() = throw UnsupportedOperationException("not required")
 
-                    override fun asSequence(sampleRate: Float): Sequence<MidiBuffer> {
+                    override fun asSequence(sampleRate: Float): Sequence<MidiChunk> {
                         return midiNotes.asSequence()
                     }
 
@@ -37,9 +36,9 @@ class SynthesizerStreamSpec : Spek({
         it("should synthesize a note") {
             val samples = synthesizerStream(
                 listOf(
-                    MidiBuffer(
+                    MidiChunk(
                         listOf(
-                            StartNote(440.0f, 0),
+                            NoteOn(440.0f, 0),
                         ),
                         4
                     ),
@@ -55,10 +54,10 @@ class SynthesizerStreamSpec : Spek({
         it("should synthesize a note and then mute it") {
             val samples = synthesizerStream(
                 listOf(
-                    MidiBuffer(
+                    MidiChunk(
                         listOf(
-                            StartNote(440.0f, 0),
-                            EndNote(3)
+                            NoteOn(440.0f, 0),
+                            NoteOff(3)
                         ),
                         4
                     ),
@@ -74,9 +73,9 @@ class SynthesizerStreamSpec : Spek({
         it("should synthesize a note and then change it") {
             val samples = synthesizerStream(
                 listOf(
-                    MidiBuffer(
+                    MidiChunk(
                         listOf(
-                            StartNote(440.0f, 0),
+                            NoteOn(440.0f, 0),
                             KeepNote(220.0f, 2)
                         ),
                         4
@@ -93,10 +92,10 @@ class SynthesizerStreamSpec : Spek({
         it("should synthesize a note and then start over") {
             val samples = synthesizerStream(
                 listOf(
-                    MidiBuffer(
+                    MidiChunk(
                         listOf(
-                            StartNote(440.0f, 0),
-                            StartNote(220.0f, 2)
+                            NoteOn(440.0f, 0),
+                            NoteOn(220.0f, 2)
                         ),
                         4
                     ),
@@ -112,15 +111,15 @@ class SynthesizerStreamSpec : Spek({
         it("should synthesize a note and then start over in a second buffer") {
             val samples = synthesizerStream(
                 listOf(
-                    MidiBuffer(
+                    MidiChunk(
                         listOf(
-                            StartNote(440.0f, 0),
+                            NoteOn(440.0f, 0),
                         ),
                         2
                     ),
-                    MidiBuffer(
+                    MidiChunk(
                         listOf(
-                            StartNote(220.0f, 0)
+                            NoteOn(220.0f, 0)
                         ),
                         2
                     ),
@@ -136,21 +135,21 @@ class SynthesizerStreamSpec : Spek({
         it("should synthesize a note then continue in a second buffer and end in the third") {
             val samples = synthesizerStream(
                 listOf(
-                    MidiBuffer(
+                    MidiChunk(
                         listOf(
-                            StartNote(440.0f, 0),
+                            NoteOn(440.0f, 0),
                         ),
                         2
                     ),
-                    MidiBuffer(
+                    MidiChunk(
                         listOf(
                             KeepNote(220.0f, 0)
                         ),
                         2
                     ),
-                    MidiBuffer(
+                    MidiChunk(
                         listOf(
-                            EndNote(0)
+                            NoteOff(0)
                         ),
                         2
                     ),
@@ -168,13 +167,13 @@ class SynthesizerStreamSpec : Spek({
         it("should synthesize a note then continue in a second buffer") {
             val samples = synthesizerStream(
                 listOf(
-                    MidiBuffer(
+                    MidiChunk(
                         listOf(
-                            StartNote(440.0f, 0),
+                            NoteOn(440.0f, 0),
                         ),
                         2
                     ),
-                    MidiBuffer(
+                    MidiChunk(
                         emptyList(),
                         2
                     ),

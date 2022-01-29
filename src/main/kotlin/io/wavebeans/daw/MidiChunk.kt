@@ -4,12 +4,12 @@ interface MidiEvent {
     val offset: Int
 }
 
-data class StartNote(
+data class NoteOn(
     val frequency: Float,
     override val offset: Int,
 ) : MidiEvent
 
-data class EndNote(
+data class NoteOff(
     override val offset: Int
 ) : MidiEvent
 
@@ -19,12 +19,12 @@ data class KeepNote(
 ) : MidiEvent
 
 
-data class PolyphonicMidiBuffer(
+data class PolyphonicMidiChunk(
     val events: Map<VoiceKey, List<MidiEvent>>,
     val length: Int
 )
 
-data class MidiBuffer(
+data class MidiChunk(
     val events: List<MidiEvent>,
     val length: Int,
 )

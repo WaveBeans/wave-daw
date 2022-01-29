@@ -17,17 +17,17 @@ class PolyphonicSynthesizerStreamParams(
 ) : BeanParams()
 
 class PolyphonicSynthesizerStream(
-    override val input: BeanStream<PolyphonicMidiBuffer>,
+    override val input: BeanStream<PolyphonicMidiChunk>,
     override val parameters: PolyphonicSynthesizerStreamParams
-) : BeanStream<SampleVector>, AlterBean<PolyphonicMidiBuffer, SampleVector> {
+) : BeanStream<SampleVector>, AlterBean<PolyphonicMidiChunk, SampleVector> {
 
     override val desiredSampleRate: Float? = null
 
     override fun asSequence(sampleRate: Float): Sequence<SampleVector> {
         val voicesStreams = HashMap<VoiceKey, Iterator<SampleVector>>()
-        val eventsForVoices = HashMap<VoiceKey, Queue<MidiBuffer>>()
+        val eventsForVoices = HashMap<VoiceKey, Queue<MidiChunk>>()
         return input.asSequence(sampleRate).asSequence()
-            .map { buffer: PolyphonicMidiBuffer ->
+            .map { buffer: PolyphonicMidiChunk ->
                 buffer.events.entries.asSequence()
                     .map { (voiceKey, events: List<MidiEvent>) ->
                         val generator = requireNotNull(parameters.generators[voiceKey]) {
@@ -35,18 +35,18 @@ class PolyphonicSynthesizerStream(
                         }
                         val voiceStream = voicesStreams.getOrPut(voiceKey) {
                             SynthesizerStream(
-                                input = object : BeanStream<MidiBuffer> {
+                                input = object : BeanStream<MidiChunk> {
                                     override val parameters: BeanParams = NoParams()
 
                                     override fun inputs(): List<AnyBean> = emptyList()
 
                                     override val desiredSampleRate: Float? = null
 
-                                    override fun asSequence(sampleRate: Float): Sequence<MidiBuffer> {
-                                        return object : Iterator<MidiBuffer> {
+                                    override fun asSequence(sampleRate: Float): Sequence<MidiChunk> {
+                                        return object : Iterator<MidiChunk> {
                                             override fun hasNext(): Boolean = true
 
-                                            override fun next(): MidiBuffer {
+                                            override fun next(): MidiChunk {
                                                 val queue = requireNotNull(eventsForVoices[voiceKey]) {
                                                     "No events for voice=$voiceKey but asked for them"
                                                 }
@@ -64,7 +64,7 @@ class PolyphonicSynthesizerStream(
                             ).asSequence(sampleRate).iterator()
                         }
                         val eventsQueue = eventsForVoices.getOrPut(voiceKey) { ArrayBlockingQueue(1) }
-                        eventsQueue.add(MidiBuffer(events, buffer.length))
+                        eventsQueue.add(MidiChunk(events, buffer.length))
                         voiceStream.next()
                     }
                     .fold(SampleVector(buffer.length) { ZeroSample }) { acc, v -> acc + v }

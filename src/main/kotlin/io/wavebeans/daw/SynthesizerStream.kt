@@ -12,9 +12,9 @@ class SynthesizerStreamParams(
 ) : BeanParams()
 
 class SynthesizerStream(
-    override val input: BeanStream<MidiBuffer>,
+    override val input: BeanStream<MidiChunk>,
     override val parameters: SynthesizerStreamParams
-) : BeanStream<SampleVector>, AlterBean<MidiBuffer, SampleVector> {
+) : BeanStream<SampleVector>, AlterBean<MidiChunk, SampleVector> {
 
     override val desiredSampleRate: Float? = null
 
@@ -28,7 +28,7 @@ class SynthesizerStream(
                 result.indices.forEach { idx ->
                     eventsByOffset[idx]?.forEach { e ->
                         when (e) {
-                            is StartNote -> {
+                            is NoteOn -> {
                                 noteOffset = 0
                                 activeGenerator = parameters.generator.apply(
                                     Signal(
@@ -47,7 +47,7 @@ class SynthesizerStream(
                                     )
                                 ).iterator()
                             }
-                            is EndNote -> {
+                            is NoteOff -> {
                                 activeGenerator = null
                                 noteOffset = 0
                             }

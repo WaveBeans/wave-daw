@@ -22,30 +22,30 @@ class PolyphonicSynthesizerStreamSpec : Spek({
         it("should interpret note sequence correctly") {
             val stream = synthesizerStream(
                 listOf(
-                    PolyphonicMidiBuffer(
+                    PolyphonicMidiChunk(
                         mapOf(
-                            "1" to listOf(StartNote(100.0f, 0)),
-                            "2" to listOf(StartNote(150.0f, 0))
+                            "1" to listOf(NoteOn(100.0f, 0)),
+                            "2" to listOf(NoteOn(150.0f, 0))
                         ),
                         6
                     ),
-                    PolyphonicMidiBuffer(
+                    PolyphonicMidiChunk(
                         mapOf(
-                            "1" to listOf(EndNote(0)),
-                            "2" to listOf(EndNote(0))
+                            "1" to listOf(NoteOff(0)),
+                            "2" to listOf(NoteOff(0))
                         ),
                         2
                     ),
-                    PolyphonicMidiBuffer(
+                    PolyphonicMidiChunk(
                         mapOf(
-                            "1" to listOf(StartNote(300.0f, 0)),
+                            "1" to listOf(NoteOn(300.0f, 0)),
                         ),
                         2
                     ),
-                    PolyphonicMidiBuffer(
+                    PolyphonicMidiChunk(
                         mapOf(
                             "1" to listOf(KeepNote(300.0f, 0)),
-                            "2" to listOf(StartNote(350.0f, 1)),
+                            "2" to listOf(NoteOn(350.0f, 1)),
                         ),
                         2
                     ),
@@ -113,9 +113,9 @@ class PolyphonicSynthesizerStreamSpec : Spek({
     }
 })
 
-private fun synthesizerStream(midiNotes: List<PolyphonicMidiBuffer>) =
+private fun synthesizerStream(midiNotes: List<PolyphonicMidiChunk>) =
     PolyphonicSynthesizerStream(
-        input = object : BeanStream<PolyphonicMidiBuffer> {
+        input = object : BeanStream<PolyphonicMidiChunk> {
             override val parameters: BeanParams
                 get() = throw UnsupportedOperationException("not required")
 
@@ -126,7 +126,7 @@ private fun synthesizerStream(midiNotes: List<PolyphonicMidiBuffer>) =
             override val desiredSampleRate: Float?
                 get() = throw UnsupportedOperationException("not required")
 
-            override fun asSequence(sampleRate: Float): Sequence<PolyphonicMidiBuffer> {
+            override fun asSequence(sampleRate: Float): Sequence<PolyphonicMidiChunk> {
                 return midiNotes.asSequence()
             }
 

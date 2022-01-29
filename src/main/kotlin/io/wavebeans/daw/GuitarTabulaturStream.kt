@@ -10,7 +10,7 @@ fun String.tab(
     bpm: Float,
     beat: Pair<Int, Int>,
     timeSignature: Pair<Int, Int>
-): BeanStream<PolyphonicMidiBuffer> =
+): BeanStream<PolyphonicMidiChunk> =
     GuitarTabulaturStream(GuitarTabulaturStreamParams(tuning, bpm, this, beat, timeSignature))
 
 class GuitarTabulaturStreamParams(
@@ -24,11 +24,11 @@ class GuitarTabulaturStreamParams(
 class GuitarTabulaturStream(
     override val parameters: GuitarTabulaturStreamParams
 
-) : BeanStream<PolyphonicMidiBuffer>, SourceBean<PolyphonicMidiBuffer> {
+) : BeanStream<PolyphonicMidiChunk>, SourceBean<PolyphonicMidiChunk> {
 
     override val desiredSampleRate: Float? = null
 
-    override fun asSequence(sampleRate: Float): Sequence<PolyphonicMidiBuffer> {
+    override fun asSequence(sampleRate: Float): Sequence<PolyphonicMidiChunk> {
         val tabulatur = GuitarTabulatur.parse(parameters.tab)
         var mistake = 0.0
         val stepLengthSec = 60.0 / (
@@ -48,18 +48,18 @@ class GuitarTabulaturStream(
         return tabulatur.steps.asSequence()
             .mapNotNull { step ->
                 if (step is Notes) {
-                    PolyphonicMidiBuffer(
+                    PolyphonicMidiChunk(
                         step.motions.keys.associateWith { key ->
                             val list = ArrayList<MidiEvent>()
                             val base = parameters.tuning.getTune().getValue(key)
                             val guitarMotion = step.motions[key]
                             if (guitarMotion == null && sounds[key] != null) {
-                                list.add(EndNote(0))
+                                list.add(NoteOff(0))
                             }
                             when (guitarMotion) {
                                 is PickNote -> {
                                     val note = base.shift(guitarMotion.fret)
-                                    list.add(StartNote(note, 0))
+                                    list.add(NoteOn(note, 0))
                                     sounds[key] = note
                                 }
                                 is KeepRinging -> {
@@ -69,7 +69,7 @@ class GuitarTabulaturStream(
                                     }
                                 }
                                 is Mute -> {
-                                    list.add(EndNote(0))
+                                    list.add(NoteOff(0))
                                 }
                             }
                             list
