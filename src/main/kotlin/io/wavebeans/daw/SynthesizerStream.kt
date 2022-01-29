@@ -34,7 +34,8 @@ class SynthesizerStream(
                                     Signal(
                                         e.frequency,
                                         1.0,
-                                        0L
+                                        0L,
+                                        sampleRate
                                     )
                                 ).iterator()
                             }
@@ -43,7 +44,8 @@ class SynthesizerStream(
                                     Signal(
                                         e.frequency,
                                         1.0,
-                                        noteOffset
+                                        noteOffset,
+                                        sampleRate
                                     )
                                 ).iterator()
                             }

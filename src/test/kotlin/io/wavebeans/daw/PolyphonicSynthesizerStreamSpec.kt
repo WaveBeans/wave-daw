@@ -140,7 +140,7 @@ private fun synthesizerStream(midiNotes: List<PolyphonicMidiChunk>) =
     )
 
 private class BaseVoice(val base: Double) : Voice() {
-    override fun getSequence(frequency: Float, amplitude: Double, sampleOffset: Long): Sequence<Sample> {
+    override fun getSequence(frequency: Float, amplitude: Double, sampleOffset: Long, sampleRate: Float): Sequence<Sample> {
         var offset = sampleOffset
         return object : Iterator<Sample> {
             override fun hasNext(): Boolean = true

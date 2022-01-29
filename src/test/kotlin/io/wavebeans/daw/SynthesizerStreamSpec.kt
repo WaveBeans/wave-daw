@@ -2,36 +2,19 @@ package io.wavebeans.daw
 
 import assertk.assertThat
 import assertk.assertions.containsExactly
+import assertk.assertions.each
+import assertk.assertions.isCloseTo
 import io.wavebeans.lib.AnyBean
 import io.wavebeans.lib.BeanParams
 import io.wavebeans.lib.BeanStream
 import io.wavebeans.lib.Sample
+import io.wavebeans.lib.io.sine
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
 class SynthesizerStreamSpec : Spek({
     describe("Synthesizing numbers") {
 
-        fun synthesizerStream(midiNotes: List<MidiChunk>) =
-            SynthesizerStream(
-                input = object : BeanStream<MidiChunk> {
-                    override val parameters: BeanParams
-                        get() = throw UnsupportedOperationException("not required")
-
-                    override fun inputs(): List<AnyBean> {
-                        throw UnsupportedOperationException("not required")
-                    }
-
-                    override val desiredSampleRate: Float?
-                        get() = throw UnsupportedOperationException("not required")
-
-                    override fun asSequence(sampleRate: Float): Sequence<MidiChunk> {
-                        return midiNotes.asSequence()
-                    }
-
-                },
-                parameters = SynthesizerStreamParams(NumericVoice)
-            )
 
         it("should synthesize a note") {
             val samples = synthesizerStream(
@@ -187,10 +170,72 @@ class SynthesizerStreamSpec : Spek({
             )
         }
     }
+    describe("Sine synth") {
+        it("should synthesize sines") {
+            val sampleRate = 100.0f
+            val samples = synthesizerStream(
+                listOf(
+                    MidiChunk(
+                        listOf(
+                            NoteOn(40.0f, 0),
+                        ),
+                        50
+                    ),
+                    MidiChunk(
+                        listOf(
+                            KeepNote(40.0f, 0),
+                        ),
+                        50
+                    ),
+                    MidiChunk(
+                        listOf(
+                            KeepNote(30.0f, 0),
+                        ),
+                        50
+                    ),
+                ),
+                voice = SineVoice()
+            ).asSequence(sampleRate).flatMap { it.asList() }.toList()
+
+            val expected = (
+                    40.sine(amplitude = 1.0).asSequence(sampleRate).take(100) +
+                            30.sine(amplitude = 1.0).asSequence(sampleRate).take(50)
+                    ).iterator()
+
+            assertThat(samples)
+                .each { it.isCloseTo(expected.next(), 1e-10) }
+        }
+    }
 })
 
+fun synthesizerStream(midiNotes: List<MidiChunk>, voice: Voice = NumericVoice) =
+    SynthesizerStream(
+        input = object : BeanStream<MidiChunk> {
+            override val parameters: BeanParams
+                get() = throw UnsupportedOperationException("not required")
+
+            override fun inputs(): List<AnyBean> {
+                throw UnsupportedOperationException("not required")
+            }
+
+            override val desiredSampleRate: Float?
+                get() = throw UnsupportedOperationException("not required")
+
+            override fun asSequence(sampleRate: Float): Sequence<MidiChunk> {
+                return midiNotes.asSequence()
+            }
+
+        },
+        parameters = SynthesizerStreamParams(voice)
+    )
+
 private object NumericVoice : Voice() {
-    override fun getSequence(frequency: Float, amplitude: Double, sampleOffset: Long): Sequence<Sample> {
+    override fun getSequence(
+        frequency: Float,
+        amplitude: Double,
+        sampleOffset: Long,
+        sampleRate: Float
+    ): Sequence<Sample> {
         var offset = sampleOffset
         return object : Iterator<Sample> {
             override fun hasNext(): Boolean = true
