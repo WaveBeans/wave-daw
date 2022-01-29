@@ -48,12 +48,10 @@ class GuitarTabulaturStream(
         return tabulatur.steps.asSequence()
             .mapNotNull { step ->
                 if (step is Notes) {
-                    val keysIterator = tabulatur.keys.iterator()
-                    PolyphonicMidiBuffer(step.motions.keys.size) { idx ->
-                        val list = ArrayList<MidiEvent>()
-                        val base = parameters.tuning.getTune()[idx]
-                        val key = if (keysIterator.hasNext()) keysIterator.next() else null
-                        if (key != null) {
+                    PolyphonicMidiBuffer(
+                        step.motions.keys.associateWith { key ->
+                            val list = ArrayList<MidiEvent>()
+                            val base = parameters.tuning.getTune().getValue(key)
                             val guitarMotion = step.motions[key]
                             if (guitarMotion == null && sounds[key] != null) {
                                 list.add(EndNote(0))
@@ -74,12 +72,10 @@ class GuitarTabulaturStream(
                                     list.add(EndNote(0))
                                 }
                             }
-                        }
-                        MidiBuffer(
-                            list,
-                            stepLengthSamples
-                        )
-                    }
+                            list
+                        },
+                        stepLengthSamples
+                    )
                 } else {
                     null
                 }

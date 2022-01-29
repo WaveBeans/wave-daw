@@ -14,32 +14,25 @@ class SynthesizerStreamSpec : Spek({
     describe("Synthesizing numbers") {
 
         fun synthesizerStream(midiNotes: List<MidiBuffer>) =
-            SynthesizerStream(object : BeanStream<MidiBuffer> {
-                override val parameters: BeanParams
-                    get() = throw UnsupportedOperationException("not required")
+            SynthesizerStream(
+                input = object : BeanStream<MidiBuffer> {
+                    override val parameters: BeanParams
+                        get() = throw UnsupportedOperationException("not required")
 
-                override fun inputs(): List<AnyBean> {
-                    throw UnsupportedOperationException("not required")
-                }
+                    override fun inputs(): List<AnyBean> {
+                        throw UnsupportedOperationException("not required")
+                    }
 
-                override val desiredSampleRate: Float?
-                    get() = throw UnsupportedOperationException("not required")
+                    override val desiredSampleRate: Float?
+                        get() = throw UnsupportedOperationException("not required")
 
-                override fun asSequence(sampleRate: Float): Sequence<MidiBuffer> {
-                    return midiNotes.asSequence()
-                }
+                    override fun asSequence(sampleRate: Float): Sequence<MidiBuffer> {
+                        return midiNotes.asSequence()
+                    }
 
-            }, SynthesizerStreamParams(
-                Fn.wrap { signal ->
-                    var offset = signal.sampleOffset
-                    object : Iterator<Sample> {
-                        override fun hasNext(): Boolean = true
-
-                        override fun next(): Sample = offset++ / 1000.0 + signal.frequency
-
-                    }.asSequence()
-                }
-            ))
+                },
+                parameters = SynthesizerStreamParams(NumericVoice)
+            )
 
         it("should synthesize a note") {
             val samples = synthesizerStream(
@@ -196,3 +189,16 @@ class SynthesizerStreamSpec : Spek({
         }
     }
 })
+
+private object NumericVoice : Voice() {
+    override fun getSequence(frequency: Float, amplitude: Double, sampleOffset: Long): Sequence<Sample> {
+        var offset = sampleOffset
+        return object : Iterator<Sample> {
+            override fun hasNext(): Boolean = true
+
+            override fun next(): Sample = offset++ / 1000.0 + frequency
+
+        }.asSequence()
+
+    }
+}

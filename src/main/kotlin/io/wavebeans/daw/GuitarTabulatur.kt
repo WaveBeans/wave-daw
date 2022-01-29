@@ -21,7 +21,7 @@ object Bar : Step {
 }
 
 data class Notes(
-    val motions: Map<String, GuitarMotion>
+    val motions: Map<VoiceKey, GuitarMotion>
 ) : Step
 
 /**
@@ -44,7 +44,7 @@ data class GuitarTabulatur(
                     }
                     line.matches("^\\s*[a-zA-Z]\\|.*".toRegex()) -> {
                         val measures = line.split("|")
-                        val key = measures[0]
+                        val key = measures[0].trim()
                         if (key !in keys) {
                             keys += key
                         }

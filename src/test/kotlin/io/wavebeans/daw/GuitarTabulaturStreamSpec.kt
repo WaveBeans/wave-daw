@@ -6,6 +6,7 @@ import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.index
 import assertk.assertions.isEqualTo
+import assertk.assertions.key
 import assertk.assertions.prop
 import assertk.assertions.size
 import org.spekframework.spek2.Spek
@@ -27,52 +28,70 @@ class GuitarTabulaturStreamSpec : Spek({
             assertThat(tab.asSequence(1000.0f).toList()).all {
                 size().isEqualTo(6)
                 index(0).all {
-                    index(0).isEqualTo(500, EndNote(0))
-                    index(1).isEqualTo(500, EndNote(0))
-                    index(2).isEqualTo(500, EndNote(0))
-                    index(3).isEqualTo(500, EndNote(0))
-                    index(4).isEqualTo(500, EndNote(0))
-                    index(5).isEqualTo(500, StartNote(E2, 0))
+                    prop(PolyphonicMidiBuffer::length).isEqualTo(500)
+                    prop(PolyphonicMidiBuffer::events).all {
+                        key("e").containsExactly(EndNote(0))
+                        key("B").containsExactly(EndNote(0))
+                        key("G").containsExactly(EndNote(0))
+                        key("D").containsExactly(EndNote(0))
+                        key("A").containsExactly(EndNote(0))
+                        key("E").containsExactly(StartNote(E2, 0))
+                    }
                 }
                 index(1).all {
-                    index(0).isEqualTo(500, EndNote(0))
-                    index(1).isEqualTo(500, EndNote(0))
-                    index(2).isEqualTo(500, StartNote(G3, 0))
-                    index(3).isEqualTo(500, EndNote(0))
-                    index(4).isEqualTo(500, EndNote(0))
-                    index(5).isEqualTo(500, EndNote(0))
+                    prop(PolyphonicMidiBuffer::length).isEqualTo(500)
+                    prop(PolyphonicMidiBuffer::events).all {
+                        key("e").containsExactly(EndNote(0))
+                        key("B").containsExactly(EndNote(0))
+                        key("G").containsExactly(StartNote(G3, 0))
+                        key("D").containsExactly(EndNote(0))
+                        key("A").containsExactly(EndNote(0))
+                        key("E").containsExactly(EndNote(0))
+                    }
                 }
                 index(2).all {
-                    index(0).isEqualTo(500, EndNote(0))
-                    index(1).isEqualTo(500, StartNote(B3, 0))
-                    index(2).isEqualTo(500, EndNote(0))
-                    index(3).isEqualTo(500, EndNote(0))
-                    index(4).isEqualTo(500, EndNote(0))
-                    index(5).isEqualTo(500, EndNote(0))
+                    prop(PolyphonicMidiBuffer::length).isEqualTo(500)
+                    prop(PolyphonicMidiBuffer::events).all {
+                        key("e").containsExactly(EndNote(0))
+                        key("B").containsExactly(StartNote(B3, 0))
+                        key("G").containsExactly(EndNote(0))
+                        key("D").containsExactly(EndNote(0))
+                        key("A").containsExactly(EndNote(0))
+                        key("E").containsExactly(EndNote(0))
+                    }
                 }
                 index(3).all {
-                    index(0).isEqualTo(500, StartNote(E4, 0))
-                    index(1).isEqualTo(500, EndNote(0))
-                    index(2).isEqualTo(500, EndNote(0))
-                    index(3).isEqualTo(500, EndNote(0))
-                    index(4).isEqualTo(500, EndNote(0))
-                    index(5).isEqualTo(500, EndNote(0))
+                    prop(PolyphonicMidiBuffer::length).isEqualTo(500)
+                    prop(PolyphonicMidiBuffer::events).all {
+                        key("e").containsExactly(StartNote(E4, 0))
+                        key("B").containsExactly(EndNote(0))
+                        key("G").containsExactly(EndNote(0))
+                        key("D").containsExactly(EndNote(0))
+                        key("A").containsExactly(EndNote(0))
+                        key("E").containsExactly(EndNote(0))
+                    }
                 }
                 index(4).all {
-                    index(0).isEqualTo(500, EndNote(0))
-                    index(1).isEqualTo(500, StartNote(B3, 0))
-                    index(2).isEqualTo(500, EndNote(0))
-                    index(3).isEqualTo(500, EndNote(0))
-                    index(4).isEqualTo(500, EndNote(0))
-                    index(5).isEqualTo(500, EndNote(0))
+                    prop(PolyphonicMidiBuffer::length).isEqualTo(500)
+                    prop(PolyphonicMidiBuffer::events).all {
+                        key("e").containsExactly(EndNote(0))
+                        key("B").containsExactly(StartNote(B3, 0))
+                        key("G").containsExactly(EndNote(0))
+                        key("D").containsExactly(EndNote(0))
+                        key("A").containsExactly(EndNote(0))
+                        key("E").containsExactly(EndNote(0))
+                    }
                 }
                 index(5).all {
-                    index(0).isEqualTo(500, EndNote(0))
-                    index(1).isEqualTo(500, EndNote(0))
-                    index(2).isEqualTo(500, StartNote(G3, 0))
-                    index(3).isEqualTo(500, EndNote(0))
-                    index(4).isEqualTo(500, EndNote(0))
-                    index(5).isEqualTo(500, EndNote(0))
+                    prop(PolyphonicMidiBuffer::length).isEqualTo(500)
+                    prop(PolyphonicMidiBuffer::events).all {
+                        key("e").containsExactly(EndNote(0))
+                        key("B").containsExactly(EndNote(0))
+                        key("G").containsExactly(StartNote(G3, 0))
+                        key("D").containsExactly(EndNote(0))
+                        key("A").containsExactly(EndNote(0))
+                        key("E").containsExactly(EndNote(0))
+                    }
                 }
             }
         }

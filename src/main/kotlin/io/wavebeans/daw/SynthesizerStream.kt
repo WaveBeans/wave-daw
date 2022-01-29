@@ -1,29 +1,20 @@
 package io.wavebeans.daw
 
-import io.wavebeans.lib.AnyBean
+import io.wavebeans.lib.AlterBean
 import io.wavebeans.lib.BeanParams
 import io.wavebeans.lib.BeanStream
-import io.wavebeans.lib.Fn
 import io.wavebeans.lib.Sample
 import io.wavebeans.lib.SampleVector
 import io.wavebeans.lib.ZeroSample
 
-data class Signal(
-    val frequency: Float,
-    val amplitude: Double,
-    val sampleOffset: Long
-)
-
 class SynthesizerStreamParams(
-    val generator: Fn<Signal, Sequence<Sample>>
+    val generator: Voice
 ) : BeanParams()
 
 class SynthesizerStream(
-    private val input: BeanStream<MidiBuffer>,
+    override val input: BeanStream<MidiBuffer>,
     override val parameters: SynthesizerStreamParams
-) : BeanStream<SampleVector> {
-
-    override fun inputs(): List<AnyBean> = listOf(input)
+) : BeanStream<SampleVector>, AlterBean<MidiBuffer, SampleVector> {
 
     override val desiredSampleRate: Float? = null
 
@@ -31,7 +22,6 @@ class SynthesizerStream(
         var noteOffset = 0L
         var activeGenerator: Iterator<Sample>? = null
         return input.asSequence(sampleRate)
-            .asSequence()
             .map { buffer ->
                 val result = SampleVector(buffer.length)
                 val eventsByOffset = buffer.events.groupBy { it.offset }

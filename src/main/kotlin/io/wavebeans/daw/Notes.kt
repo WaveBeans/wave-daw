@@ -22,9 +22,16 @@ interface GuitarTuning {
     /**
      * Gets the notes the guitar is tuned from the thinnest to the thickest strings.
      */
-    fun getTune(): List<Note>
+    fun getTune(): Map<VoiceKey, Note>
 }
 
 object Standard6StringTuning : GuitarTuning {
-    override fun getTune(): List<Note> = listOf(E4, B3, G3, D3, A2, E2)
+    override fun getTune(): Map<VoiceKey, Note> = mapOf(
+        "e" to E4,
+        "B" to B3,
+        "G" to G3,
+        "D" to D3,
+        "A" to A2,
+        "E" to E2
+    )
 }
