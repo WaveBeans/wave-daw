@@ -147,7 +147,10 @@ private class BaseVoice(val base: Double) : Voice() {
         return object : Iterator<Sample> {
             override fun hasNext(): Boolean = true
 
-            override fun next(): Sample = base + offset++ / 1000.0 + frequency
+            override fun next(): Sample {
+                if (!hasNext()) throw NoSuchElementException()
+                return base + offset++ / 1000.0 + frequency
+            }
 
         }.asSequence()
 

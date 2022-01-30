@@ -53,23 +53,26 @@ class GuitarTabulaturStream(
                             val list = ArrayList<MidiEvent>()
                             val base = parameters.tuning.getTune().getValue(key)
                             val guitarMotion = step.motions[key]
-                            if (guitarMotion == null && sounds[key] != null) {
-                                list.add(NoteOff(0))
-                            }
-                            when (guitarMotion) {
-                                is PickNote -> {
+                            when {
+                                guitarMotion == null && sounds[key] != null -> {
+                                    list.add(NoteOff(0))
+                                }
+                                guitarMotion is PickNote -> {
                                     val note = base.shift(guitarMotion.fret)
                                     list.add(NoteOn(note, 0))
                                     sounds[key] = note
                                 }
-                                is KeepRinging -> {
+                                guitarMotion is KeepRinging -> {
                                     val note = sounds[key]
                                     if (note != null) {
                                         list.add(KeepNote(note, 0))
                                     }
                                 }
-                                is Mute -> {
+                                guitarMotion is Mute -> {
                                     list.add(NoteOff(0))
+                                }
+                                else -> {
+                                    throw UnsupportedOperationException("Guitar motion $guitarMotion is unsupported. Sounds=$sounds")
                                 }
                             }
                             list

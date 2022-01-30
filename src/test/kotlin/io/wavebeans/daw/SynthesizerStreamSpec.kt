@@ -280,7 +280,10 @@ private object NumericVoice : Voice() {
         return object : Iterator<Sample> {
             override fun hasNext(): Boolean = true
 
-            override fun next(): Sample = offset++ / 1000.0 + frequency
+            override fun next(): Sample {
+                if (!hasNext()) throw NoSuchElementException()
+                return offset++ / 1000.0 + frequency
+            }
 
         }.asSequence()
 
