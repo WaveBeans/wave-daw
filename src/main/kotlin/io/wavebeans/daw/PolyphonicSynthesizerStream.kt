@@ -11,9 +11,19 @@ import io.wavebeans.lib.plus
 import java.util.*
 import java.util.concurrent.ArrayBlockingQueue
 import kotlin.collections.HashMap
+import kotlin.math.absoluteValue
+
+fun BeanStream<PolyphonicMidiChunk>.synthesize(
+    voices: Map<VoiceKey, Voice>,
+    normalize: Boolean = true,
+    voiceFadeInOut: Double = 0.005,
+): BeanStream<SampleVector> =
+    PolyphonicSynthesizerStream(this, PolyphonicSynthesizerStreamParams(voices, normalize, voiceFadeInOut))
 
 class PolyphonicSynthesizerStreamParams(
-    val generators: Map<VoiceKey, Voice>
+    val generators: Map<VoiceKey, Voice>,
+    val normalize: Boolean,
+    val voiceFadeInOut: Double,
 ) : BeanParams()
 
 class PolyphonicSynthesizerStream(
@@ -27,8 +37,8 @@ class PolyphonicSynthesizerStream(
         val voicesStreams = HashMap<VoiceKey, Iterator<SampleVector>>()
         val eventsForVoices = HashMap<VoiceKey, Queue<MidiChunk>>()
         return input.asSequence(sampleRate).asSequence()
-            .map { buffer: PolyphonicMidiChunk ->
-                buffer.events.entries.asSequence()
+            .map { chunk: PolyphonicMidiChunk ->
+                val vector = chunk.events.entries.asSequence()
                     .map { (voiceKey, events: List<MidiEvent>) ->
                         val generator = requireNotNull(parameters.generators[voiceKey]) {
                             "$voiceKey is not found among synthesizers"
@@ -60,15 +70,19 @@ class PolyphonicSynthesizerStream(
                                     }
 
                                 },
-                                parameters = SynthesizerStreamParams(generator)
+                                parameters = SynthesizerStreamParams(generator, parameters.voiceFadeInOut)
                             ).asSequence(sampleRate).iterator()
                         }
                         val eventsQueue = eventsForVoices.getOrPut(voiceKey) { ArrayBlockingQueue(1) }
-                        eventsQueue.add(MidiChunk(events, buffer.length))
+                        eventsQueue.add(MidiChunk(events, chunk.length))
                         voiceStream.next()
                     }
-                    .fold(SampleVector(buffer.length) { ZeroSample }) { acc, v -> acc + v }
+                    .fold(SampleVector(chunk.length) { ZeroSample }) { acc, v -> acc + v }
+                if (parameters.normalize) {
+                    val maxPeak = vector.asSequence().map { it.absoluteValue }.maxOrNull()!!
+                    vector.indices.forEach { idx -> vector[idx] /= maxPeak }
+                }
+                vector
             }
     }
-
 }

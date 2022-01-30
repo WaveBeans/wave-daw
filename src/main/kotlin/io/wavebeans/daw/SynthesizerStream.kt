@@ -6,9 +6,13 @@ import io.wavebeans.lib.BeanStream
 import io.wavebeans.lib.Sample
 import io.wavebeans.lib.SampleVector
 import io.wavebeans.lib.ZeroSample
+import io.wavebeans.lib.times
+import kotlin.math.max
+import kotlin.math.min
 
 class SynthesizerStreamParams(
-    val generator: Voice
+    val generator: Voice,
+    val fadeInOut: Double
 ) : BeanParams()
 
 class SynthesizerStream(
@@ -29,12 +33,11 @@ class SynthesizerStream(
                     eventsByOffset[idx]?.forEach { e ->
                         when (e) {
                             is NoteOn -> {
-                                noteOffset = 0
                                 activeGenerator = parameters.generator.apply(
                                     Signal(
                                         e.frequency,
                                         1.0,
-                                        0L,
+                                        noteOffset,
                                         sampleRate
                                     )
                                 ).iterator()
@@ -51,7 +54,6 @@ class SynthesizerStream(
                             }
                             is NoteOff -> {
                                 activeGenerator = null
-                                noteOffset = 0
                             }
                             else -> {
                                 throw UnsupportedOperationException("MidiEvent $e is not supported")
@@ -61,7 +63,35 @@ class SynthesizerStream(
                     result[idx] = activeGenerator?.next()?.also { noteOffset++ } ?: ZeroSample
 
                 }
-                result
+
+                if (parameters.fadeInOut > 0.0) {
+                    val limit = max(buffer.length * 0.005, 2.0)
+
+                    val fadeInOutVector = SampleVector(buffer.length) {
+                        if (it < limit) {
+                            min(
+                                max(
+                                    it / limit,
+                                    0.0
+                                ),
+                                1.0
+                            )
+                        } else if (buffer.length - 1 - it <= limit) {
+                            min(
+                                max(
+                                    (buffer.length - 1 - it) / limit,
+                                    0.0
+                                ),
+                                1.0
+                            )
+                        } else {
+                            1.0
+                        }
+                    }
+                    result * fadeInOutVector
+                } else {
+                    result
+                }
             }
     }
 }

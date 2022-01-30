@@ -89,22 +89,22 @@ class PolyphonicSynthesizerStreamSpec : Spek({
                 index(1).containsExactly(ZeroSample, ZeroSample)
                 index(2).all {
                     index(0).isCloseTo(
-                        1_000_000.0 + 300.0 + 0.000,
+                        1_000_000.0 + 300.0 + 0.006,
                         1e-4
                     )
                     index(1).isCloseTo(
-                        1_000_000.0 + 300.0 + 0.001,
+                        1_000_000.0 + 300.0 + 0.007,
                         1e-4
                     )
                 }
                 index(3).all {
                     index(0).isCloseTo(
-                        1_000_000.0 + 300.0 + 0.002,
+                        1_000_000.0 + 300.0 + 0.008,
                         1e-4
                     )
                     index(1).isCloseTo(
-                        1_000_000.0 + 300.0 + 0.003 +
-                                2_000_000.0 + 350.0 + 0.000,
+                        1_000_000.0 + 300.0 + 0.009 +
+                                2_000_000.0 + 350.0 + 0.006,
                         1e-4
                     )
                 }
@@ -135,7 +135,9 @@ private fun synthesizerStream(midiNotes: List<PolyphonicMidiChunk>) =
             mapOf(
                 "1" to BaseVoice(1_000_000.0),
                 "2" to BaseVoice(2_000_000.0),
-            )
+            ),
+            false,
+            0.0
         )
     )
 

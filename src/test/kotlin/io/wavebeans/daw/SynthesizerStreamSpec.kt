@@ -87,8 +87,8 @@ class SynthesizerStreamSpec : Spek({
             assertThat(samples).containsExactly(
                 440.000,
                 440.001,
-                220.000,
-                220.001
+                220.002,
+                220.003
             )
         }
         it("should synthesize a note and then start over in a second buffer") {
@@ -111,8 +111,8 @@ class SynthesizerStreamSpec : Spek({
             assertThat(samples).containsExactly(
                 440.000,
                 440.001,
-                220.000,
-                220.001
+                220.002,
+                220.003
             )
         }
         it("should synthesize a note then continue in a second buffer and end in the third") {
@@ -145,6 +145,46 @@ class SynthesizerStreamSpec : Spek({
                 220.003,
                 000.000,
                 000.000
+            )
+        }
+        it("should synthesize a note then continue in a second buffer and end in the third, in the forth keep the through offset") {
+            val samples = synthesizerStream(
+                listOf(
+                    MidiChunk(
+                        listOf(
+                            NoteOn(440.0f, 0),
+                        ),
+                        2
+                    ),
+                    MidiChunk(
+                        listOf(
+                            KeepNote(220.0f, 0)
+                        ),
+                        2
+                    ),
+                    MidiChunk(
+                        listOf(
+                            NoteOff(0)
+                        ),
+                        2
+                    ),
+                    MidiChunk(
+                        listOf(
+                            NoteOn(110.0f, 0)
+                        ),
+                        2
+                    ),
+                )
+            ).asSequence(100.0f).flatMap { it.asList() }.toList()
+            assertThat(samples).containsExactly(
+                440.000,
+                440.001,
+                220.002,
+                220.003,
+                000.000,
+                000.000,
+                110.004,
+                110.005
             )
         }
         it("should synthesize a note then continue in a second buffer") {
@@ -226,7 +266,7 @@ fun synthesizerStream(midiNotes: List<MidiChunk>, voice: Voice = NumericVoice) =
             }
 
         },
-        parameters = SynthesizerStreamParams(voice)
+        parameters = SynthesizerStreamParams(voice, 0.0)
     )
 
 private object NumericVoice : Voice() {
